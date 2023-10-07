@@ -37,13 +37,13 @@ public class Frog : MonoBehaviour
             iterationCount++;
             body.GetComponent<Rigidbody2D>().AddForce(jumpDirection);
             body.transform.Rotate(0, 0, rotationRate);
-            Debug.Log("Jumping " + count);
+            //Debug.Log("Jumping " + count);
             yield return new WaitForFixedUpdate();
         }
 
         while (!frontHand.GetComponent<ToggleCollider>().IsColliding())
         {
-            Debug.Log("waiting to land: " + count);
+            //Debug.Log("waiting to land: " + count);
             yield return new WaitForFixedUpdate();
         }
         
@@ -59,7 +59,7 @@ public class Frog : MonoBehaviour
 
     private void AdjustTargets()
     {
-        Debug.Log("Adjusting targets " + count);
+        //Debug.Log("Adjusting targets " + count);
         Vector3 targetTarget = handReferencePoint.transform.position - targetOffset;
         Vector3 currentKnee = frontFoot.transform.position;
         Vector3 pos = Vector3.MoveTowards(currentKnee, targetTarget, fixLegsRate);
@@ -103,8 +103,6 @@ public class Frog : MonoBehaviour
         {
             AdjustTargets();
         }
-        
-        
 
         if (state == FrogState.IDLE) //&& (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.A)))
         {
@@ -116,9 +114,11 @@ public class Frog : MonoBehaviour
             {
                 SetFlip(true);
             }
-            state = FrogState.JUMPING;
-            Debug.Log("Starting jump coroutine " + count);
-            StartCoroutine(Jump());
+            if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.A)) {
+                state = FrogState.JUMPING;
+                Debug.Log("Starting jump coroutine " + count);
+                StartCoroutine(Jump());
+            }
         }
 
         Time.timeScale = this.timeScale;
