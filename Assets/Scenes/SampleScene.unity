@@ -589,6 +589,7 @@ MonoBehaviour:
   frontHand: {fileID: 119428931}
   jumpDirection: {x: 0, y: 700}
   hopDirection: {x: 500, y: 600}
+  airHorizontalVector: {x: 200, y: 0}
   fixLegsRate: 0.8
   timeScale: 1
   airtime: 0

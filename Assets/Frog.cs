@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Frog : MonoBehaviour
@@ -25,11 +26,12 @@ public class Frog : MonoBehaviour
     [SerializeField] private GameObject handReferencePoint;
     [SerializeField] private GameObject frontHand;
 
-    public const int MAX_JUMP = 500;
+    public const int MAX_JUMP = 1000;
 
     private Vector3 targetOffset;
     public Vector2 jumpDirection;
     public Vector2 hopDirection;
+    public Vector2 airHorizontalVector;
 
     private FrogState state = FrogState.IDLE;
     private int count = 0;
@@ -47,18 +49,25 @@ public class Frog : MonoBehaviour
         float iterationCount = 0;
         airtime = 0;
         
+
         //!checks if frog body is on the ground
 
         //jumping
         while (frontFoot.GetComponent<ToggleCollider>().IsColliding() || iterationCount < 5)
         {
             iterationCount++;
+            
+            //cuts jump off early if player isn't holding down jump
+            if (!hopping && !Input.GetKey(KeyCode.Space)){
+                break;
+            }
+
             body.GetComponent<Rigidbody2D>().AddForce(jumpVector);
             body.transform.Rotate(0, 0, rotationRate);
             //Debug.Log("Jumping " + count);
             yield return new WaitForFixedUpdate();
         }
-
+        
         //airtime
         while (!frontHand.GetComponent<ToggleCollider>().IsColliding())
         {
@@ -117,10 +126,37 @@ public class Frog : MonoBehaviour
     }
 
     private void airtimeJumpMovement() {
+        Vector2 deltaVec = new Vector2(0, 0);
+        
         if(airtime < MAX_JUMP && Input.GetKey(KeyCode.Space)){
             airtime++;
-            body.GetComponent<Rigidbody2D>().AddForce(new Vector2(0, 30));
+            
+            //Please don't change this value before talking to me!
+            deltaVec.y += 85;
         }
+        //snappy horiztonal direction changing
+        if (Input.GetKey(KeyCode.A)){
+            //left key and not currently moving right
+            if (body.GetComponent<Rigidbody2D>().velocity.x <= 0){
+                deltaVec.x -= airHorizontalVector.x;
+            }else{
+                Rigidbody2D rb = body.GetComponent<Rigidbody2D>();
+                //sets current x velocity to zero
+                rb.velocity = new Vector3(0, rb.velocity.y);
+            }
+        }
+        else if (Input.GetKey(KeyCode.D)){
+            //right key and not currently moving left
+            if (body.GetComponent<Rigidbody2D>().velocity.x >= 0){
+                deltaVec.x += airHorizontalVector.x;
+            }else{
+                Rigidbody2D rb = body.GetComponent<Rigidbody2D>();
+                //sets current x velocity to zero
+                rb.velocity = new Vector3(0, rb.velocity.y);
+            }
+        }
+
+        body.GetComponent<Rigidbody2D>().AddForce(deltaVec);
     }
 
     private void FixedUpdate()
