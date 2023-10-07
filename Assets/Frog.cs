@@ -23,6 +23,8 @@ public class Frog : MonoBehaviour
     [SerializeField] private GameObject frontFoot;
     [SerializeField] private GameObject backFoot;
     [SerializeField] private GameObject handReferencePoint;
+    [SerializeField] private GameObject handRootPoint;
+    [SerializeField] private GameObject upperArm;
     [SerializeField] private GameObject frontHand;
 
     public const int MAX_JUMP = 500;
@@ -38,6 +40,14 @@ public class Frog : MonoBehaviour
     public int airtime = 0;
 
     private bool flippedLeft = false;
+    public Checkpoint currentCheckpoint;
+
+    public static Frog instance;
+
+    void Awake()
+    {
+        instance = this;
+    }
 
 
     //if hopping is false, we know player is jumping    
@@ -62,6 +72,8 @@ public class Frog : MonoBehaviour
         //airtime
         while (!frontHand.GetComponent<ToggleCollider>().IsColliding())
         {
+            ProcessArms();
+            FixBodyRotation();
             //Debug.Log("waiting to land: " + count);
             if(!hopping){
                 airtimeJumpMovement();
@@ -81,12 +93,12 @@ public class Frog : MonoBehaviour
     }
 
     //tucks legs back
-    private void AdjustTargets()
+    private void AdjustTargets(bool instant = false)
     {
         //Debug.Log("Adjusting targets " + count);
         Vector3 targetTarget = handReferencePoint.transform.position - targetOffset;
         Vector3 currentKnee = frontFoot.transform.position;
-        Vector3 pos = Vector3.MoveTowards(currentKnee, targetTarget, fixLegsRate);
+        Vector3 pos = instant ? targetTarget : Vector3.MoveTowards(currentKnee, targetTarget, fixLegsRate);
         frontFootTarget.transform.position = pos;
         backFootTarget.transform.position = pos;
         if (Vector3.Distance(frontFootTarget.transform.position, targetTarget) < 0.01f)
@@ -123,6 +135,56 @@ public class Frog : MonoBehaviour
         }
     }
 
+    private void ProcessArms()
+    {
+        float angle = Vector2.SignedAngle(Vector2.right,
+            handReferencePoint.transform.position - handRootPoint.transform.position);
+        Debug.Log(angle + " " + handRootPoint.transform.position + " " + handReferencePoint.transform.position);
+        float newAngle = Mathf.MoveTowardsAngle(angle, -90, 6);
+        float offset = newAngle - angle;
+        float upperArmAngle = upperArm.transform.rotation.eulerAngles.z;
+        float newUpperArmAngle = upperArmAngle + offset;
+        newUpperArmAngle = Mathf.Clamp(newUpperArmAngle, 210, 315);
+        upperArm.transform.rotation = Quaternion.Euler(0, 0, newUpperArmAngle);
+    }
+
+    private void FixBodyRotation()
+    {
+        float bodyAngle = body.transform.rotation.eulerAngles.z;
+        if (bodyAngle is < -5 or > 25)
+        {
+            body.transform.rotation = Quaternion.Euler(0, body.transform.rotation.eulerAngles.y, Mathf.LerpAngle(bodyAngle, 0, 0.1f));
+        }
+    }
+
+    public void TeleportToCheckpoint(Checkpoint checkpoint)
+    {
+        body.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
+        body.GetComponent<Rigidbody2D>().angularVelocity = 0;
+        body.transform.position = checkpoint.transform.position;
+        body.transform.rotation = Quaternion.Euler(body.transform.rotation.eulerAngles.x, body.transform.rotation.eulerAngles.y, 0);
+        AdjustTargets(instant: true);
+        SetFlip(checkpoint.flippedLeft);
+    }
+
+    public void Respawn()
+    {
+        TeleportToCheckpoint(currentCheckpoint);
+    }
+
+    public void SetCheckpoint(Checkpoint checkpoint)
+    {
+        currentCheckpoint = checkpoint;
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            Respawn();
+        }
+    }
+    
     private void FixedUpdate()
     {
         count++;
