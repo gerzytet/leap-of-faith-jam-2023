@@ -581,15 +581,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   backFootTarget: {fileID: 1777802862}
   frontFootTarget: {fileID: 205893370}
-  jumpDirection: {x: 500, y: 600}
   body: {fileID: 1642719559}
   rotationRate: -7
   frontFoot: {fileID: 1079027808}
   backFoot: {fileID: 2094849473}
   handReferencePoint: {fileID: 1077489332}
   frontHand: {fileID: 119428931}
+  jumpDirection: {x: 0, y: 700}
+  hopDirection: {x: 500, y: 600}
   fixLegsRate: 0.8
   timeScale: 1
+  airtime: 0
 --- !u!1 &572503580
 GameObject:
   m_ObjectHideFlags: 0
