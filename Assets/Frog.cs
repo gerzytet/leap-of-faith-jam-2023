@@ -7,6 +7,13 @@ using System;
 using System.Collections;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.InputSystem;
+
+/*CONTROLLER KEYS
+Bottom Face Button = Joystick 0
+D-PAD = Input.GetAxis("Debug Horizontal")
+Joystick = Input.GetAxis("Horizontal")
+*/
 
 public class Frog : MonoBehaviour
 {
@@ -42,6 +49,21 @@ public class Frog : MonoBehaviour
     private bool flippedLeft = false;
 
 
+    // float DPADHorizontal = Input.GetAxis("Horizontal");
+
+    // public bool leftDPADDown() {
+    //     return (DPADHorizontal < 0 && DPADHorizontal >= -1);
+    // }
+
+    // public bool rightDPADDown() {
+    //     return (DPADHorizontal > 0 && DPADHorizontal <= 1);
+    // }
+
+    //(Input.GetAxis("Horizontal") < 0 && Input.GetAxis("Horizontal") >= -1)
+
+    //(Input.GetAxisRaw("Debug Horizontal") == -1)
+
+
     //if hopping is false, we know player is jumping    
     IEnumerator Jump(Vector2 jumpVector, bool hopping)
     {
@@ -58,7 +80,7 @@ public class Frog : MonoBehaviour
             iterationCount++;
             
             //cuts jump off early if player isn't holding down jump
-            if (!hopping && !Input.GetKey(KeyCode.Space)){
+            if (!hopping && !Input.GetKey(KeyCode.Space) && !Input.GetKey(KeyCode.JoystickButton0)){
                 break;
             }
 
@@ -128,28 +150,37 @@ public class Frog : MonoBehaviour
     private void airtimeJumpMovement() {
         Vector2 deltaVec = new Vector2(0, 0);
         
-        if(airtime < MAX_JUMP && Input.GetKey(KeyCode.Space)){
+        if(airtime < MAX_JUMP && (Input.GetKey(KeyCode.Space) || Input.GetKey(KeyCode.JoystickButton0))){
             airtime++;
             
             //Please don't change this value before talking to me!
             deltaVec.y += 85;
         }
-        //snappy horiztonal direction changing
-        if (Input.GetKey(KeyCode.A)){
+        
+        //snappy horiztonal direction changing. If using DPAD, movement will depend on how hard you are pressing.
+        if (Input.GetKey(KeyCode.A) || (Input.GetAxisRaw("Horizontal") < 0 && Input.GetAxisRaw("Horizontal") >= -1) || (Input.GetAxisRaw("Debug Horizontal") == -1)){
             //left key and not currently moving right
-            if (body.GetComponent<Rigidbody2D>().velocity.x <= 0){
+            if (body.GetComponent<Rigidbody2D>().velocity.x <= 0 && (Input.GetKey(KeyCode.A) || (Input.GetAxisRaw("Debug Horizontal") == -1))){
                 deltaVec.x -= airHorizontalVector.x;
-            }else{
+            }
+            else if (body.GetComponent<Rigidbody2D>().velocity.x <= 0 && (Input.GetAxisRaw("Horizontal") < 0 && Input.GetAxisRaw("Horizontal") >= -1)){
+                //need to add cause it will already be a negative
+                deltaVec.x += (airHorizontalVector.x * Input.GetAxisRaw("Horizontal"));
+            }
+            else{
                 Rigidbody2D rb = body.GetComponent<Rigidbody2D>();
                 //sets current x velocity to zero
                 rb.velocity = new Vector3(0, rb.velocity.y);
             }
         }
-        else if (Input.GetKey(KeyCode.D)){
+        else if (Input.GetKey(KeyCode.D) || (Input.GetAxisRaw("Horizontal") > 0 && Input.GetAxisRaw("Horizontal") <= 1) || (Input.GetAxisRaw("Debug Horizontal") == 1)){
             //right key and not currently moving left
-            if (body.GetComponent<Rigidbody2D>().velocity.x >= 0){
+            if (body.GetComponent<Rigidbody2D>().velocity.x >= 0 && (Input.GetKey(KeyCode.D) || (Input.GetAxisRaw("Debug Horizontal") == 1))){
                 deltaVec.x += airHorizontalVector.x;
-            }else{
+            }else if (body.GetComponent<Rigidbody2D>().velocity.x >= 0 && (Input.GetAxisRaw("Horizontal") > 0 && Input.GetAxisRaw("Horizontal") <= 1)){
+                deltaVec.x += (airHorizontalVector.x * Input.GetAxisRaw("Horizontal"));
+            }
+            else{
                 Rigidbody2D rb = body.GetComponent<Rigidbody2D>();
                 //sets current x velocity to zero
                 rb.velocity = new Vector3(0, rb.velocity.y);
@@ -157,10 +188,12 @@ public class Frog : MonoBehaviour
         }
 
         body.GetComponent<Rigidbody2D>().AddForce(deltaVec);
+        Debug.Log("X vel: " + deltaVec.x);
+        Debug.Log(Input.GetAxisRaw("Horizontal").ToString());
     }
 
     private void FixedUpdate()
-    {
+    {        
         count++;
         if (count < 50)
         {
@@ -173,22 +206,27 @@ public class Frog : MonoBehaviour
 
         if (state == FrogState.IDLE) //&& (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.A)))
         {
-            if (Input.GetKey(KeyCode.D))
+            if (Input.GetKey(KeyCode.D) || (Input.GetAxisRaw("Horizontal") > 0 && Input.GetAxisRaw("Horizontal") <= 1) || (Input.GetAxisRaw("Debug Horizontal") == 1))
             {
                 SetFlip(false);
             }
-            else if (Input.GetKey(KeyCode.A))
+            else if (Input.GetKey(KeyCode.A) || (Input.GetAxisRaw("Horizontal") < 0 && Input.GetAxisRaw("Horizontal") >= -1) || (Input.GetAxisRaw("Debug Horizontal") == -1))
             {
                 SetFlip(true);
             }
 
-            if(Input.GetKey(KeyCode.Space)){
+            if(Input.GetKey(KeyCode.Space) || Input.GetKey(KeyCode.JoystickButton0)){
                 StartCoroutine(Jump(jumpDirection, false));
             }
-            else if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.A)) {
-                state = FrogState.JUMPING;
-                Debug.Log("Starting jump coroutine " + count);
-                StartCoroutine(Jump(hopDirection, true));
+            else if (Input.GetKey(KeyCode.D) ||
+                    Input.GetKey(KeyCode.A) ||
+                    (Input.GetAxisRaw("Horizontal") < 0 && Input.GetAxisRaw("Horizontal") >= -1) ||
+                    (Input.GetAxisRaw("Horizontal") > 0 && Input.GetAxisRaw("Horizontal") <= 1) ||
+                    (Input.GetAxisRaw("Debug Horizontal") == -1) ||
+                    (Input.GetAxisRaw("Debug Horizontal") == 1)) {
+                        state = FrogState.JUMPING;
+                        Debug.Log("Starting jump coroutine " + count);
+                        StartCoroutine(Jump(hopDirection, true));
             }
         }
 
