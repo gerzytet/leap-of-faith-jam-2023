@@ -13,6 +13,7 @@ public class Frog : MonoBehaviour
     {
         JUMPING,
         LANDING,
+        MIDAIR,
         IDLE
     }
 
@@ -63,12 +64,12 @@ public class Frog : MonoBehaviour
     }
 
     //if hopping is false, we know player is jumping    
-    IEnumerator Jump(Vector2 jumpVector, bool hopping)
+    /*IEnumerator Jump(Vector2 jumpVector, bool hopping)
     {
         state = FrogState.JUMPING;
         //float iterationCount = 0;
         airtime = 0;
-        float defaultAngle = body.transform.rotation.eulerAngles.z;
+        //float defaultAngle = body.transform.rotation.eulerAngles.z;
         
         FreezeTargets();
         //jumping
@@ -96,6 +97,46 @@ public class Frog : MonoBehaviour
         //landing
         state = FrogState.LANDING;
         FreezeTargets();
+    }*/
+
+    void StartJump(Vector2 jumpVector, bool hopping)
+    {
+        state = FrogState.JUMPING;
+        jumpTime = 0;
+        this.jumpVector = jumpVector;
+        this.hopping = hopping;
+        FreezeTargets();
+    }
+
+    private int jumpTime = 0;
+    private Vector2 jumpVector;
+    private bool hopping;
+    void JumpUpdate()
+    {
+        switch (state)
+        {
+            case FrogState.JUMPING:
+                bodyBox.GetComponent<Rigidbody2D>().AddForce(jumpVector);
+                jumpTime++;
+                if (jumpTime >= 5)
+                {
+                    UnlockTargets();
+                    state = FrogState.MIDAIR;
+                }
+                break;
+            case FrogState.MIDAIR:
+                if(!hopping){
+                    airtimeJumpMovement();
+                }
+
+                if (bodyBox.GetComponent<ToggleCollider>().IsColliding())
+                {
+                    FreezeTargets();
+                    state = FrogState.LANDING;
+                }
+
+                break;
+        }
     }
     
     // Update is called once per frame
@@ -227,14 +268,18 @@ public class Frog : MonoBehaviour
             }
 
             if(Input.GetKey(KeyCode.Space)){
-                StartCoroutine(Jump(jumpDirection, false));
+                StartJump(jumpDirection, false);
+                //StartCoroutine(Jump(jumpDirection, false));
             }
             else if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.A)) {
                 state = FrogState.JUMPING;
                 Debug.Log("Starting jump coroutine " + count);
-                StartCoroutine(Jump(hopDirection, true));
+                StartJump(hopDirection, true);
             }
         }
+
+        JumpUpdate();
+        
 
         Time.timeScale = this.timeScale;
     }
