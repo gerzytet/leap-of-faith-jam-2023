@@ -16,6 +16,7 @@ public class Frog : MonoBehaviour
         IDLE
     }
 
+    [SerializeField] private GameObject bodyBox;
     [SerializeField] private GameObject backFootTarget;
     [SerializeField] private GameObject frontFootTarget;
     [SerializeField] private GameObject body;
@@ -49,6 +50,17 @@ public class Frog : MonoBehaviour
         instance = this;
     }
 
+    private void FreezeTargets()
+    {
+        backFootTarget.transform.parent.transform.SetParent(transform);
+        frontFootTarget.transform.parent.transform.SetParent(transform);
+    }
+
+    private void UnlockTargets()
+    {
+        backFootTarget.transform.parent.transform.SetParent(bodyBox.transform);
+        frontFootTarget.transform.parent.transform.SetParent(bodyBox.transform);
+    }
 
     //if hopping is false, we know player is jumping    
     IEnumerator Jump(Vector2 jumpVector, bool hopping)
@@ -56,24 +68,24 @@ public class Frog : MonoBehaviour
         state = FrogState.JUMPING;
         float iterationCount = 0;
         airtime = 0;
+        float defaultAngle = body.transform.rotation.eulerAngles.z;
         
-        //!checks if frog body is on the ground
-
+        FreezeTargets();
         //jumping
-        while (frontFoot.GetComponent<ToggleCollider>().IsColliding() || iterationCount < 5)
+        for (int i = 0; i < 5; i++)
         {
-            iterationCount++;
-            body.GetComponent<Rigidbody2D>().AddForce(jumpVector);
-            body.transform.Rotate(0, 0, rotationRate);
+            bodyBox.GetComponent<Rigidbody2D>().AddForce(jumpVector);
+            //body.transform.Rotate(0, 0, rotationRate);
             //Debug.Log("Jumping " + count);
             yield return new WaitForFixedUpdate();
         }
-
+        
+        UnlockTargets();
         //airtime
-        while (!frontHand.GetComponent<ToggleCollider>().IsColliding())
+        while (!bodyBox.GetComponent<ToggleCollider>().IsColliding())
         {
-            ProcessArms();
-            FixBodyRotation();
+            //ProcessArms();
+            //FixBodyRotation();
             //Debug.Log("waiting to land: " + count);
             if(!hopping){
                 airtimeJumpMovement();
@@ -83,6 +95,7 @@ public class Frog : MonoBehaviour
         
         //landing
         state = FrogState.LANDING;
+        FreezeTargets();
     }
     
     // Update is called once per frame
@@ -99,18 +112,6 @@ public class Frog : MonoBehaviour
         Vector3 targetTarget = handReferencePoint.transform.position - targetOffset;
         Vector3 currentKnee = frontFoot.transform.position;
         Vector3 pos = instant ? targetTarget : Vector3.MoveTowards(currentKnee, targetTarget, fixLegsRate);
-        ContactFilter2D filter = new()
-        {
-            useTriggers = false,
-            layerMask = Physics2D.AllLayers - LayerMask.GetMask("frog")
-        };
-        Collider2D[] results = new Collider2D[1];
-        int numHits = Physics2D.OverlapPoint(pos, filter, results);
-        if (numHits != 0)
-        {
-            state = FrogState.IDLE;
-            return;
-        }
         frontFootTarget.transform.position = pos;
         backFootTarget.transform.position = pos;
         if (Vector3.Distance(frontFootTarget.transform.position, targetTarget) < 0.01f)
@@ -123,16 +124,16 @@ public class Frog : MonoBehaviour
     {
         if (this.flippedLeft != flippedLeft)
         {
-            body.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
-            body.GetComponent<Rigidbody2D>().angularVelocity = 0;
+            bodyBox.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
+            bodyBox.GetComponent<Rigidbody2D>().angularVelocity = 0;
             //rotationRate = -rotationRate;
             targetOffset.x = -targetOffset.x;
             hopDirection.x = -hopDirection.x;
-            body.transform.rotation = Quaternion.Euler(body.transform.rotation.eulerAngles.x, flippedLeft ? 180 : 0, body.transform.rotation.eulerAngles.z);
-            float frontFootTargetOffset = body.transform.position.x - frontFootTarget.transform.position.x;
-            frontFootTarget.transform.position = new Vector3(body.transform.position.x + frontFootTargetOffset, frontFootTarget.transform.position.y, frontFootTarget.transform.position.z);
-            float backFootTargetOffset = body.transform.position.x - backFootTarget.transform.position.x;
-            backFootTarget.transform.position = new Vector3(body.transform.position.x + backFootTargetOffset, backFootTarget.transform.position.y, backFootTarget.transform.position.z);
+            bodyBox.transform.rotation = Quaternion.Euler(bodyBox.transform.rotation.eulerAngles.x, flippedLeft ? 180 : 0, bodyBox.transform.rotation.eulerAngles.z);
+            float frontFootTargetOffset = bodyBox.transform.position.x - frontFootTarget.transform.position.x;
+            frontFootTarget.transform.position = new Vector3(bodyBox.transform.position.x + frontFootTargetOffset, frontFootTarget.transform.position.y, frontFootTarget.transform.position.z);
+            float backFootTargetOffset = bodyBox.transform.position.x - backFootTarget.transform.position.x;
+            backFootTarget.transform.position = new Vector3(bodyBox.transform.position.x + backFootTargetOffset, backFootTarget.transform.position.y, backFootTarget.transform.position.z);
             
             frontFoot.transform.localScale = new Vector3(-frontFoot.transform.localScale.x, frontFoot.transform.localScale.y, frontFoot.transform.localScale.z);
             backFoot.transform.localScale = new Vector3(-backFoot.transform.localScale.x, backFoot.transform.localScale.y, backFoot.transform.localScale.z);
@@ -143,7 +144,7 @@ public class Frog : MonoBehaviour
     private void airtimeJumpMovement() {
         if(airtime < MAX_JUMP && Input.GetKey(KeyCode.Space)){
             airtime++;
-            body.GetComponent<Rigidbody2D>().AddForce(new Vector2(0, 30));
+            bodyBox.GetComponent<Rigidbody2D>().AddForce(new Vector2(0, 30));
         }
     }
 
@@ -176,10 +177,10 @@ public class Frog : MonoBehaviour
 
     public void TeleportToCheckpoint(Checkpoint checkpoint)
     {
-        body.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
-        body.GetComponent<Rigidbody2D>().angularVelocity = 0;
-        body.transform.position = checkpoint.transform.position;
-        body.transform.rotation = Quaternion.Euler(body.transform.rotation.eulerAngles.x, body.transform.rotation.eulerAngles.y, 0);
+        bodyBox.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
+        bodyBox.GetComponent<Rigidbody2D>().angularVelocity = 0;
+        bodyBox.transform.position = checkpoint.transform.position;
+        //body.transform.rotation = Quaternion.Euler(body.transform.rotation.eulerAngles.x, body.transform.rotation.eulerAngles.y, 0);
         AdjustTargets(instant: true);
         SetFlip(checkpoint.flippedLeft);
     }
