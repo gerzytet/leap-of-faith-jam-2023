@@ -99,6 +99,18 @@ public class Frog : MonoBehaviour
         Vector3 targetTarget = handReferencePoint.transform.position - targetOffset;
         Vector3 currentKnee = frontFoot.transform.position;
         Vector3 pos = instant ? targetTarget : Vector3.MoveTowards(currentKnee, targetTarget, fixLegsRate);
+        ContactFilter2D filter = new()
+        {
+            useTriggers = false,
+            layerMask = Physics2D.AllLayers - LayerMask.GetMask("frog")
+        };
+        Collider2D[] results = new Collider2D[1];
+        int numHits = Physics2D.OverlapPoint(pos, filter, results);
+        if (numHits != 0)
+        {
+            state = FrogState.IDLE;
+            return;
+        }
         frontFootTarget.transform.position = pos;
         backFootTarget.transform.position = pos;
         if (Vector3.Distance(frontFootTarget.transform.position, targetTarget) < 0.01f)
@@ -154,6 +166,11 @@ public class Frog : MonoBehaviour
         if (bodyAngle is < -5 or > 25)
         {
             body.transform.rotation = Quaternion.Euler(0, body.transform.rotation.eulerAngles.y, Mathf.LerpAngle(bodyAngle, 0, 0.1f));
+        }
+
+        if (Mathf.Abs(body.GetComponent<Rigidbody2D>().angularVelocity) > 20)
+        {
+            body.GetComponent<Rigidbody2D>().angularVelocity *= 0.8f;
         }
     }
 
