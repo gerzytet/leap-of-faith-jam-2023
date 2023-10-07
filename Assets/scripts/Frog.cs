@@ -24,9 +24,9 @@ public class Frog : MonoBehaviour
     [SerializeField] private GameObject frontFoot;
     [SerializeField] private GameObject backFoot;
     [SerializeField] private GameObject handReferencePoint;
-    [SerializeField] private GameObject handRootPoint;
-    [SerializeField] private GameObject upperArm;
-    [SerializeField] private GameObject frontHand;
+    //[SerializeField] private GameObject handRootPoint;
+    //[SerializeField] private GameObject upperArm;
+    //[SerializeField] private GameObject frontHand;
 
     public const int MAX_JUMP = 500;
 
@@ -66,7 +66,7 @@ public class Frog : MonoBehaviour
     IEnumerator Jump(Vector2 jumpVector, bool hopping)
     {
         state = FrogState.JUMPING;
-        float iterationCount = 0;
+        //float iterationCount = 0;
         airtime = 0;
         float defaultAngle = body.transform.rotation.eulerAngles.z;
         
@@ -148,7 +148,7 @@ public class Frog : MonoBehaviour
         }
     }
 
-    private void ProcessArms()
+    /*private void ProcessArms()
     {
         float angle = Vector2.SignedAngle(Vector2.right,
             handReferencePoint.transform.position - handRootPoint.transform.position);
@@ -159,7 +159,7 @@ public class Frog : MonoBehaviour
         float newUpperArmAngle = upperArmAngle + offset;
         newUpperArmAngle = Mathf.Clamp(newUpperArmAngle, 210, 315);
         upperArm.transform.rotation = Quaternion.Euler(0, 0, newUpperArmAngle);
-    }
+    }*/
 
     private void FixBodyRotation()
     {
