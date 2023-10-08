@@ -1,3 +1,8 @@
+/*
+@Authors - Craig
+@Description - keeps track of collider objects
+*/
+
 using UnityEngine;
 
 public class ToggleCollider : MonoBehaviour
