@@ -35,6 +35,11 @@ public class Frog : MonoBehaviour
     {
         return (Input.GetKey(KeyCode.Space) || Input.GetKey(KeyCode.JoystickButton0));
     }
+    
+    public bool jumpButtonJustPressed()
+    {
+        return (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.JoystickButton0));
+    }
 
     public bool leftButtonPressed()
     {
@@ -282,6 +287,11 @@ public class Frog : MonoBehaviour
             return;
         }
 
+        if (state == FrogState.HANGING)
+        {
+            return;
+        }
+
         SetArmsAngle(grabArmAngle);
         bodyBox.GetComponent<Rigidbody2D>().constraints &= ~RigidbodyConstraints2D.FreezeRotation;
         bodyBox.transform.rotation = Quaternion.Euler(0, bodyBox.transform.rotation.eulerAngles.y, 90);
@@ -420,7 +430,7 @@ public class Frog : MonoBehaviour
         {
             Respawn();
         }
-        if (state == FrogState.HANGING && jumpButtonPressed())
+        if (state == FrogState.HANGING && jumpButtonJustPressed())
         {
             ReleaseVine();
         }
