@@ -3024,8 +3024,8 @@ Transform:
   m_Father: {fileID: 5402614573892669584}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1001 &1146331790
-PrefabInstance:
+--- !u!1 &1161884790
+GameObject:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
@@ -3286,6 +3286,7 @@ Transform:
   - {fileID: 2064915247}
   - {fileID: 696998309}
   - {fileID: 677542620}
+  - {fileID: 1161884791}
   m_Father: {fileID: 0}
   m_RootOrder: 22
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
