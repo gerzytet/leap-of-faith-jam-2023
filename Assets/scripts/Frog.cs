@@ -6,8 +6,15 @@
 using System;
 using System.Collections;
 using Unity.VisualScripting;
-using UnityEditor.Search;
 using UnityEngine;
+using UnityEngine.InputSystem;
+
+/*CONTROLLER KEYS
+Bottom Face Button = Joystick 0
+Left Face Button = Joystick 2
+D-PAD = Input.GetAxis("Debug Horizontal")
+Joystick = Input.GetAxis("Horizontal")
+*/
 
 public class Frog : MonoBehaviour
 {
@@ -37,11 +44,12 @@ public class Frog : MonoBehaviour
     [SerializeField] private GameObject upperBackArm;
     //[SerializeField] private GameObject frontHand;
 
-    public const int MAX_JUMP = 500;
+    public const int MAX_JUMP = 1000;
 
     private Vector3 targetOffset;
     public Vector2 jumpDirection;
     public Vector2 hopDirection;
+    public Vector2 airHorizontalVector;
 
     public FrogState state = FrogState.IDLE;
     private int count = 0;
@@ -51,6 +59,20 @@ public class Frog : MonoBehaviour
 
     private bool flippedLeft = false;
     public Checkpoint currentCheckpoint;
+
+    // float DPADHorizontal = Input.GetAxis("Horizontal");
+
+    // public bool leftDPADDown() {
+    //     return (DPADHorizontal < 0 && DPADHorizontal >= -1);
+    // }
+
+    // public bool rightDPADDown() {
+    //     return (DPADHorizontal > 0 && DPADHorizontal <= 1);
+    // }
+
+    //(Input.GetAxis("Horizontal") < 0 && Input.GetAxis("Horizontal") >= -1)
+
+    //(Input.GetAxisRaw("Debug Horizontal") == -1)
 
     public static Frog instance;
 
@@ -71,45 +93,11 @@ public class Frog : MonoBehaviour
         frontFootTarget.transform.parent.transform.SetParent(bodyBox.transform);
     }
 
-    //if hopping is false, we know player is jumping    
-    /*IEnumerator Jump(Vector2 jumpVector, bool hopping)
-    {
-        state = FrogState.JUMPING;
-        //float iterationCount = 0;
-        airtime = 0;
-        //float defaultAngle = body.transform.rotation.eulerAngles.z;
-        
-        FreezeTargets();
-        //jumping
-        for (int i = 0; i < 5; i++)
-        {
-            bodyBox.GetComponent<Rigidbody2D>().AddForce(jumpVector);
-            //body.transform.Rotate(0, 0, rotationRate);
-            //Debug.Log("Jumping " + count);
-            yield return new WaitForFixedUpdate();
-        }
-        
-        UnlockTargets();
-        //airtime
-        while (!bodyBox.GetComponent<ToggleCollider>().IsColliding())
-        {
-            //ProcessArms();
-            //FixBodyRotation();
-            //Debug.Log("waiting to land: " + count);
-            if(!hopping){
-                airtimeJumpMovement();
-            }
-            yield return new WaitForFixedUpdate();
-        }
-        
-        //landing
-        state = FrogState.LANDING;
-        FreezeTargets();
-    }*/
-
+    //if hopping is false, we know player is jumping
     void StartJump(Vector2 jumpVector, bool hopping)
     {
         state = FrogState.JUMPING;
+        airtime = 0;
         jumpTime = 0;
         this.jumpVector = jumpVector;
         this.hopping = hopping;
@@ -134,9 +122,16 @@ public class Frog : MonoBehaviour
     private float lastZRotation = 0f;
     void JumpUpdate()
     {
+        // Debug.Log("Hor Vel: " + airHorizontalVector.x);
+        //jumping, airtime, and landing
         switch (state)
         {
             case FrogState.JUMPING:
+                //cuts jump off early if player isn't holding down jump
+                if (!hopping && !Input.GetKey(KeyCode.Space) && !Input.GetKey(KeyCode.JoystickButton0)){
+                    break;
+                }
+                
                 bodyBox.GetComponent<Rigidbody2D>().AddForce(jumpVector);
                 jumpTime++;
                 if (jumpTime >= 5)
@@ -263,14 +258,11 @@ public class Frog : MonoBehaviour
     }
 
     private void airtimeJumpMovement() {
-        if(airtime < MAX_JUMP && Input.GetKey(KeyCode.Space)){
+        Vector2 deltaVec = new Vector2(0, 0);
+        
+        if(airtime < MAX_JUMP && (Input.GetKey(KeyCode.Space) || Input.GetKey(KeyCode.JoystickButton0))){
             airtime++;
             bodyBox.GetComponent<Rigidbody2D>().AddForce(new Vector2(0, 30));
-        }
-
-        if (Input.GetKey(KeyCode.A))
-        {
-            bodyBox.GetComponent<Rigidbody2D>().AddForce(new Vector2(100, 0));
         }
     }
 
@@ -289,15 +281,15 @@ public class Frog : MonoBehaviour
 
     private void FixBodyRotation()
     {
-        float bodyAngle = body.transform.rotation.eulerAngles.z;
+        float bodyAngle = bodyBox.transform.rotation.eulerAngles.z;
         if (bodyAngle is < -5 or > 25)
         {
-            body.transform.rotation = Quaternion.Euler(0, body.transform.rotation.eulerAngles.y, Mathf.LerpAngle(bodyAngle, 0, 0.1f));
+            bodyBox.transform.rotation = Quaternion.Euler(0, bodyBox.transform.rotation.eulerAngles.y, Mathf.LerpAngle(bodyAngle, 0, 0.1f));
         }
 
-        if (Mathf.Abs(body.GetComponent<Rigidbody2D>().angularVelocity) > 20)
+        if (Mathf.Abs(bodyBox.GetComponent<Rigidbody2D>().angularVelocity) > 20)
         {
-            body.GetComponent<Rigidbody2D>().angularVelocity *= 0.8f;
+            bodyBox.GetComponent<Rigidbody2D>().angularVelocity *= 0.8f;
         }
     }
 
@@ -306,7 +298,7 @@ public class Frog : MonoBehaviour
         bodyBox.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
         bodyBox.GetComponent<Rigidbody2D>().angularVelocity = 0;
         bodyBox.transform.position = checkpoint.transform.position;
-        //body.transform.rotation = Quaternion.Euler(body.transform.rotation.eulerAngles.x, body.transform.rotation.eulerAngles.y, 0);
+        //bodyBox.transform.rotation = Quaternion.Euler(bodyBox.transform.rotation.eulerAngles.x, bodyBox.transform.rotation.eulerAngles.y, 0);
         AdjustTargets(instant: true);
         SetFlip(checkpoint.flippedLeft);
     }
@@ -323,7 +315,7 @@ public class Frog : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.R))
+        if (Input.GetKeyDown(KeyCode.R) || Input.GetKey(KeyCode.JoystickButton2))
         {
             Respawn();
         }
@@ -345,25 +337,31 @@ public class Frog : MonoBehaviour
             AdjustTargets();
         }
 
+        //main input code
         if (state == FrogState.IDLE) //&& (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.A)))
         {
-            if (Input.GetKey(KeyCode.D))
+            if (Input.GetKey(KeyCode.D) || (Input.GetAxisRaw("Horizontal") > 0 && Input.GetAxisRaw("Horizontal") <= 1) || (Input.GetAxisRaw("Debug Horizontal") == 1))
             {
                 SetFlip(false);
             }
-            else if (Input.GetKey(KeyCode.A))
+            else if (Input.GetKey(KeyCode.A) || (Input.GetAxisRaw("Horizontal") < 0 && Input.GetAxisRaw("Horizontal") >= -1) || (Input.GetAxisRaw("Debug Horizontal") == -1))
             {
                 SetFlip(true);
             }
 
-            if(Input.GetKey(KeyCode.Space)){
+            if(Input.GetKey(KeyCode.Space) || Input.GetKey(KeyCode.JoystickButton0)){
                 StartJump(jumpDirection, false);
                 //StartCoroutine(Jump(jumpDirection, false));
             }
-            else if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.A)) {
-                state = FrogState.JUMPING;
-                Debug.Log("Starting jump coroutine " + count);
-                StartJump(hopDirection, true);
+            else if (Input.GetKey(KeyCode.D) ||
+                    Input.GetKey(KeyCode.A) ||
+                    (Input.GetAxisRaw("Horizontal") < 0 && Input.GetAxisRaw("Horizontal") >= -1) ||
+                    (Input.GetAxisRaw("Horizontal") > 0 && Input.GetAxisRaw("Horizontal") <= 1) ||
+                    (Input.GetAxisRaw("Debug Horizontal") == -1) ||
+                    (Input.GetAxisRaw("Debug Horizontal") == 1)) {
+                        state = FrogState.JUMPING;
+                        Debug.Log("Starting jump coroutine " + count);
+                        StartJump(hopDirection, true);
             }
         }
 
