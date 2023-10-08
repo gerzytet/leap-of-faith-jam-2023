@@ -9,7 +9,7 @@ public class Sign : MonoBehaviour
     {
         if (col.gameObject.GetComponentInParent<Frog>() != null)
         {
-            SignOverlay.instance.Display("merp de derp");
+            SignOverlay.instance.Display(text);
         }
     }
     
