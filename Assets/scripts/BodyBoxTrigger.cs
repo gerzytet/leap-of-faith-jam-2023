@@ -3,6 +3,7 @@
 @Description - This is where all collision code for tilemap layers goes
 */
 
+using System;
 using UnityEngine;
 
 public class BodyBoxTrigger : MonoBehaviour
@@ -14,12 +15,17 @@ public class BodyBoxTrigger : MonoBehaviour
         {
             floorContacts++;
         }
-        else if (collider.gameObject.layer == LayerMask.NameToLayer("spikes"))
+    }
+
+    void OnCollisionEnter2D(Collision2D collision)
+    {
+        //Debug.Log("Collding " + (1 << collision.gameObject.layer) + " " + LayerMask.NameToLayer("spikes"));
+        if (collision.gameObject.layer == LayerMask.NameToLayer("spikes"))
         {
             Frog.instance.Die();
         }
     }
-    
+
     void OnTriggerExit2D(Collider2D collider)
     {
         if (collider.gameObject.layer == LayerMask.NameToLayer("floor"))

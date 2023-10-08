@@ -405,6 +405,7 @@ public class Frog : MonoBehaviour
 
     public void Die()
     {
+        Debug.Log("dying");
         StartCoroutine(DieRoutine());
     }
 
