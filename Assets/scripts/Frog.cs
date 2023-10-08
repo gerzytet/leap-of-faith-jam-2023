@@ -145,7 +145,7 @@ public class Frog : MonoBehaviour
                     airtimeJumpMovement();
                 }
 
-                if (bodyBox.GetComponent<BodyBoxTrigger>().floorContacts > 0)
+                if (bodyBox.GetComponent<BodyBoxTrigger>().floorContacts > 0 && bodyBox.GetComponent<Rigidbody2D>().velocity.y < 0.1f)
                 {
                     FreezeTargets();
                     state = FrogState.LANDING;
