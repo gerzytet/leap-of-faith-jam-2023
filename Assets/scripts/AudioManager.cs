@@ -6,6 +6,7 @@ public class AudioManager : MonoBehaviour
     public AudioSource springSource;
     public AudioSource jumpSource;
     public AudioSource deathSource;
+    public AudioSource hopSource;
     void Awake()
     {
         instance = this;
@@ -24,5 +25,10 @@ public class AudioManager : MonoBehaviour
     public void PlayDeath()
     {
         deathSource.Play();
+    }
+
+    public void PlayHop()
+    {
+        hopSource.Play();
     }
 }
