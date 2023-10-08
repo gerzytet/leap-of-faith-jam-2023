@@ -105,6 +105,8 @@ public class Frog : MonoBehaviour
     public float fixLegsRate;
     public int airtime = 0;
 
+    private int currentLevel = 1;
+
     private bool flippedLeft = false;
     public Checkpoint currentCheckpoint;
 
@@ -390,19 +392,32 @@ public class Frog : MonoBehaviour
         }
     }
 
-    public void TeleportToCheckpoint(Checkpoint checkpoint)
+    public void TeleportToPosition(Vector3 position)
     {
         bodyBox.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
         bodyBox.GetComponent<Rigidbody2D>().angularVelocity = 0;
-        bodyBox.transform.position = checkpoint.transform.position;
+        bodyBox.transform.position = position;
         //bodyBox.transform.rotation = Quaternion.Euler(bodyBox.transform.rotation.eulerAngles.x, bodyBox.transform.rotation.eulerAngles.y, 0);
         AdjustTargets(instant: true);
-        SetFlip(checkpoint.flippedLeft);
+    }
+
+    public void TeleportToLevel(){
+        //!You MUST follow this naming convention for this to work!
+        string nextCheckpointName = ("Level " + currentLevel.ToString() + " Checkpoint");
+        Debug.Log(nextCheckpointName);
+        GameObject nLevel = GameObject.Find(nextCheckpointName);
+        TeleportToPosition(nLevel.transform.position);
     }
 
     public void Respawn()
     {
-        TeleportToCheckpoint(currentCheckpoint);
+        TeleportToPosition(currentCheckpoint.transform.position);
+        SetFlip(currentCheckpoint.flippedLeft);
+    }
+
+    public void reachedFlag(){
+        ++currentLevel;
+        TeleportToLevel();
     }
 
     public IEnumerator DieRoutine()
