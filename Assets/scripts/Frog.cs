@@ -160,6 +160,11 @@ public class Frog : MonoBehaviour
         {
             AudioManager.instance.PlayJump();
         }
+
+        if (jumpType == JumpType.HOP)
+        {
+            AudioManager.instance.PlayHop();
+        }
         state = FrogState.JUMPING;
         airtime = 0;
         jumpTime = 0;
