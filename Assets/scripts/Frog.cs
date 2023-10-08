@@ -401,6 +401,8 @@ public class Frog : MonoBehaviour
         AdjustTargets(instant: true);
     }
 
+
+    //call stack: OnTriggerStay2D() -> reachedFlag -> TeleportToLevel -> TeleportToPosition
     public void TeleportToLevel(){
         //!You MUST follow this naming convention for this to work!
         string nextCheckpointName = ("Level " + currentLevel.ToString() + " Checkpoint");
@@ -415,8 +417,9 @@ public class Frog : MonoBehaviour
         SetFlip(currentCheckpoint.flippedLeft);
     }
 
-    public void reachedFlag(){
-        ++currentLevel;
+    public void reachedFlag(int flagNumber){
+        Debug.Log("Reached flag");
+        currentLevel = flagNumber + 1;
         TeleportToLevel();
     }
 
