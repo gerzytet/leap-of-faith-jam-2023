@@ -150,6 +150,16 @@ public class Frog : MonoBehaviour
         {
             return;
         }
+
+        if (jumpType == JumpType.SPRING)
+        {
+            AudioManager.instance.PlaySpring();
+        }
+
+        if (jumpType == JumpType.JUMP)
+        {
+            AudioManager.instance.PlayJump();
+        }
         state = FrogState.JUMPING;
         airtime = 0;
         jumpTime = 0;
@@ -433,6 +443,7 @@ public class Frog : MonoBehaviour
 
     public void Die()
     {
+        AudioManager.instance.PlayDeath();
         Debug.Log("dying");
         StartCoroutine(DieRoutine());
     }
