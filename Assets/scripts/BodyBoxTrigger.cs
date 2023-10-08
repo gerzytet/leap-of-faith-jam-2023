@@ -14,6 +14,10 @@ public class BodyBoxTrigger : MonoBehaviour
         {
             floorContacts++;
         }
+        else if (collider.gameObject.layer == LayerMask.NameToLayer("spikes"))
+        {
+            Frog.instance.Die();
+        }
     }
     
     void OnTriggerExit2D(Collider2D collider)
