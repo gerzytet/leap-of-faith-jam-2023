@@ -98,7 +98,6 @@ public class Frog : MonoBehaviour
     public FrogState state = FrogState.IDLE;
     private int count = 0;
     public float fixLegsRate;
-    public float timeScale;
     public int airtime = 0;
 
     private bool flippedLeft = false;
@@ -396,6 +395,20 @@ public class Frog : MonoBehaviour
         TeleportToCheckpoint(currentCheckpoint);
     }
 
+    public IEnumerator DieRoutine()
+    {
+        Time.timeScale = 0;
+        yield return new WaitForSecondsRealtime(1);
+        Time.timeScale = 1;
+        Respawn();
+    }
+
+    public void Die()
+    {
+        Debug.Log("dying");
+        StartCoroutine(DieRoutine());
+    }
+
     public void SetCheckpoint(Checkpoint checkpoint)
     {
         currentCheckpoint = checkpoint;
@@ -457,8 +470,5 @@ public class Frog : MonoBehaviour
         }
 
         JumpUpdate();
-        
-
-        Time.timeScale = this.timeScale;
     }
 }

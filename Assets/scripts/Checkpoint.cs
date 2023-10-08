@@ -22,7 +22,10 @@ public class Checkpoint : MonoBehaviour
 
     void Update()
     {
-        GetComponent<SpriteRenderer>().color =
-            Frog.instance.currentCheckpoint == this ? activeColor : inactiveColor;
+        if (GetComponent<SpriteRenderer>() != null)
+        {
+            GetComponent<SpriteRenderer>().color =
+                Frog.instance.currentCheckpoint == this ? activeColor : inactiveColor;
+        }
     }
 }
