@@ -262,8 +262,45 @@ public class Frog : MonoBehaviour
         
         if(airtime < MAX_JUMP && (Input.GetKey(KeyCode.Space) || Input.GetKey(KeyCode.JoystickButton0))){
             airtime++;
-            bodyBox.GetComponent<Rigidbody2D>().AddForce(new Vector2(0, 30));
+            
+            //Please don't change this value before talking to me!
+            deltaVec.y += 85;
         }
+        
+        //snappy horiztonal direction changing. If using DPAD, movement will depend on how hard you are pressing.
+        if (Input.GetKey(KeyCode.A) || (Input.GetAxisRaw("Horizontal") < 0 && Input.GetAxisRaw("Horizontal") >= -1) || (Input.GetAxisRaw("Debug Horizontal") == -1)){
+            //left key and not currently moving right
+            if (bodyBox.GetComponent<Rigidbody2D>().velocity.x <= 0 && (Input.GetKey(KeyCode.A) || (Input.GetAxisRaw("Debug Horizontal") == -1))){
+                // Debug.Log("We are moving left, and hor vel is " + airHorizontalVector.x);
+                deltaVec.x -= airHorizontalVector.x;
+            }
+            else if (bodyBox.GetComponent<Rigidbody2D>().velocity.x <= 0 && (Input.GetAxisRaw("Horizontal") < 0 && Input.GetAxisRaw("Horizontal") >= -1)){
+                //need to add cause it will already be a negative
+                deltaVec.x += (airHorizontalVector.x * Input.GetAxisRaw("Horizontal"));
+            }
+            else{
+                Rigidbody2D rb = bodyBox.GetComponent<Rigidbody2D>();
+                //sets current x velocity to zero
+                rb.velocity = new Vector3(0, rb.velocity.y);
+            }
+        }
+        else if (Input.GetKey(KeyCode.D) || (Input.GetAxisRaw("Horizontal") > 0 && Input.GetAxisRaw("Horizontal") <= 1) || (Input.GetAxisRaw("Debug Horizontal") == 1)){
+            //right key and not currently moving left
+            if (bodyBox.GetComponent<Rigidbody2D>().velocity.x >= 0 && (Input.GetKey(KeyCode.D) || (Input.GetAxisRaw("Debug Horizontal") == 1))){
+                deltaVec.x += airHorizontalVector.x;
+            }else if (bodyBox.GetComponent<Rigidbody2D>().velocity.x >= 0 && (Input.GetAxisRaw("Horizontal") > 0 && Input.GetAxisRaw("Horizontal") <= 1)){
+                deltaVec.x += (airHorizontalVector.x * Input.GetAxisRaw("Horizontal"));
+            }
+            else{
+                Rigidbody2D rb = bodyBox.GetComponent<Rigidbody2D>();
+                //sets current x velocity to zero
+                rb.velocity = new Vector3(0, rb.velocity.y);
+            }
+        }
+
+        bodyBox.GetComponent<Rigidbody2D>().AddForce(deltaVec);
+        // Debug.Log("X vel: " + deltaVec.x);
+        // Debug.Log(Input.GetAxisRaw("Horizontal").ToString());
     }
 
     /*private void ProcessArms()
