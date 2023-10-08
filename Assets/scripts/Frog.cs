@@ -32,7 +32,7 @@ public class Frog : MonoBehaviour
 
 
     public bool jumpButtonPressed(){
-        return (Input.GetKeyDown(KeyCode.Space) || Input.GetKey(KeyCode.JoystickButton0));
+        return (Input.GetKey(KeyCode.Space) || Input.GetKey(KeyCode.JoystickButton0));
     }
 
     public bool leftButtonPressed(){
@@ -44,7 +44,7 @@ public class Frog : MonoBehaviour
     }
 
     public bool teleportButtonPressed(){
-        return ((Input.GetKeyDown(KeyCode.R) || Input.GetKey(KeyCode.JoystickButton2)));
+        return ((Input.GetKey(KeyCode.R) || Input.GetKey(KeyCode.JoystickButton2)));
     }
 
     public enum FrogState
