@@ -12,6 +12,10 @@ public class SignOverlay : MonoBehaviour
         instance = this;
     }
 
+    void Start() {
+        Undisplay();
+    }
+
     public void Display(string s)
     {
         gameObject.SetActive(true);
