@@ -5,16 +5,20 @@
 
 using System;
 using System.Collections;
+using Unity.VisualScripting;
+using UnityEditor.Search;
 using UnityEngine;
 
 public class Frog : MonoBehaviour
 {
-    enum FrogState
+    public enum FrogState
     {
         JUMPING,
         LANDING,
         MIDAIR,
-        IDLE
+        IDLE,
+        HANGING,
+        SPINNING
     }
 
     [SerializeField] private GameObject bodyBox;
@@ -24,9 +28,13 @@ public class Frog : MonoBehaviour
     [SerializeField] private float rotationRate;
     [SerializeField] private GameObject frontFoot;
     [SerializeField] private GameObject backFoot;
+
     [SerializeField] private GameObject handReferencePoint;
+
     //[SerializeField] private GameObject handRootPoint;
-    //[SerializeField] private GameObject upperArm;
+    [SerializeField] private GameObject upperFrontArm;
+
+    [SerializeField] private GameObject upperBackArm;
     //[SerializeField] private GameObject frontHand;
 
     public const int MAX_JUMP = 500;
@@ -35,7 +43,7 @@ public class Frog : MonoBehaviour
     public Vector2 jumpDirection;
     public Vector2 hopDirection;
 
-    private FrogState state = FrogState.IDLE;
+    public FrogState state = FrogState.IDLE;
     private int count = 0;
     public float fixLegsRate;
     public float timeScale;
@@ -108,9 +116,22 @@ public class Frog : MonoBehaviour
         FreezeTargets();
     }
 
+    void Unspin()
+    {
+        Debug.Log("Unspinning");
+        state = FrogState.MIDAIR;
+        bodyBox.transform.rotation = Quaternion.Euler(0, bodyBox.transform.rotation.eulerAngles.y, 0);
+        bodyBox.GetComponent<Rigidbody2D>().angularVelocity = 0f;
+        bodyBox.GetComponent<Rigidbody2D>().constraints |= RigidbodyConstraints2D.FreezeRotation;
+        AdjustTargets(instant: true, outstretched:true);
+        grabbedVine = null;
+        SetArmsAngle(startArmAngle);
+    }
+
     private int jumpTime = 0;
     private Vector2 jumpVector;
     private bool hopping;
+    private float lastZRotation = 0f;
     void JumpUpdate()
     {
         switch (state)
@@ -129,11 +150,22 @@ public class Frog : MonoBehaviour
                     airtimeJumpMovement();
                 }
 
-                if (bodyBox.GetComponent<ToggleCollider>().IsColliding())
+                if (bodyBox.GetComponent<BodyBoxTrigger>().floorContacts > 0)
                 {
                     FreezeTargets();
                     state = FrogState.LANDING;
                 }
+
+                break;
+            case FrogState.SPINNING:
+                spinTime++;
+
+                if (spinTime >= MAX_SPIN_TIME)// && lastZRotation > 0f && bodyBox.transform.rotation.eulerAngles.z < 0f)
+                {
+                    Unspin();
+                }
+
+                //lastZRotation = bodyBox.transform.rotation.eulerAngles.z;
 
                 break;
         }
@@ -147,15 +179,19 @@ public class Frog : MonoBehaviour
     }
 
     //tucks legs back
-    private void AdjustTargets(bool instant = false)
+    private void AdjustTargets(bool instant = false, bool outstretched = true)
     {
         //Debug.Log("Adjusting targets " + count);
         Vector3 targetTarget = handReferencePoint.transform.position - targetOffset;
+        if (outstretched)
+        {
+            targetTarget -= targetOffset * 0.7f;
+        }
         Vector3 currentKnee = frontFoot.transform.position;
         Vector3 pos = instant ? targetTarget : Vector3.MoveTowards(currentKnee, targetTarget, fixLegsRate);
         frontFootTarget.transform.position = pos;
         backFootTarget.transform.position = pos;
-        if (Vector3.Distance(frontFootTarget.transform.position, targetTarget) < 0.01f)
+        if (!instant && Vector3.Distance(frontFootTarget.transform.position, targetTarget) < 0.01f)
         {
             state = FrogState.IDLE;
         }
@@ -182,10 +218,59 @@ public class Frog : MonoBehaviour
         }
     }
 
+    private const float startArmAngle = -92f;
+    private const float grabArmAngle = -35f;
+
+    private VinePoint grabbedVine;
+
+    private void SetArmsAngle(float angle)
+    {
+        upperBackArm.transform.rotation = Quaternion.Euler(upperBackArm.transform.rotation.eulerAngles.x,
+            upperBackArm.transform.rotation.eulerAngles.y, angle);
+        upperFrontArm.transform.rotation = Quaternion.Euler(upperFrontArm.transform.rotation.eulerAngles.x,
+            upperFrontArm.transform.rotation.eulerAngles.y, angle);
+    }
+    public void GrabVine(VinePoint vine)
+    {
+        if (grabbedVine == vine)
+        {
+            return;
+        }
+
+        SetArmsAngle(grabArmAngle);
+        bodyBox.GetComponent<Rigidbody2D>().constraints &= ~RigidbodyConstraints2D.FreezeRotation;
+        bodyBox.transform.rotation = Quaternion.Euler(0, bodyBox.transform.rotation.eulerAngles.y, 90);
+        vine.grabJoint.enabled = true;
+        vine.grabJoint.connectedBody = bodyBox.GetComponent<Rigidbody2D>();
+        vine.grabJoint.connectedAnchor =bodyBox.transform.InverseTransformPoint(handReferencePoint.transform.position);
+        state = FrogState.HANGING;
+        grabbedVine = vine;
+        /*new Vector2(1.6f,
+                -0.35f); //*/
+    }
+
+    private int MAX_SPIN_TIME = 25;
+    public int spinTime = 0;
+    private void ReleaseVine()
+    {
+        spinTime = 0;
+        state = FrogState.SPINNING;
+        bodyBox.GetComponent<Rigidbody2D>().angularVelocity = 1000f;
+        grabbedVine.grabJoint.enabled = false;
+        bodyBox.GetComponent<Rigidbody2D>().AddForce(jumpDirection * 2f);
+        AdjustTargets(instant: true);
+        hopping = false;
+    }
+
     private void airtimeJumpMovement() {
         if(airtime < MAX_JUMP && Input.GetKey(KeyCode.Space)){
             airtime++;
             bodyBox.GetComponent<Rigidbody2D>().AddForce(new Vector2(0, 30));
+        }
+
+        if (Input.GetKey(KeyCode.A))
+        {
+            bodyBox.GetComponent<Rigidbody2D>().AddForce(new Vector2(100, 0));
         }
     }
 
@@ -242,6 +327,10 @@ public class Frog : MonoBehaviour
         {
             Respawn();
         }
+        if (state == FrogState.HANGING && Input.GetKeyDown(KeyCode.Space))
+        {
+            ReleaseVine();
+        }
     }
     
     private void FixedUpdate()
@@ -276,6 +365,11 @@ public class Frog : MonoBehaviour
                 Debug.Log("Starting jump coroutine " + count);
                 StartJump(hopDirection, true);
             }
+        }
+
+        if (state == FrogState.HANGING)
+        {
+            airtimeJumpMovement();
         }
 
         JumpUpdate();
