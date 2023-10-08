@@ -1,3 +1,8 @@
+/*
+@Authors - Craig
+@Description - Controls vine physics
+*/
+
 using System;
 using UnityEngine;
 

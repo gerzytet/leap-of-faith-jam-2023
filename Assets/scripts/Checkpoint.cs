@@ -1,3 +1,8 @@
+/*
+@Authors - Craig and Patrick
+@Description - Handles checkpoints
+*/
+
 using System;
 using UnityEngine;
 

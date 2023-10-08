@@ -1,3 +1,8 @@
+/*
+@Authors - Patrick
+@Description - Main menu code
+*/
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;

@@ -1,3 +1,8 @@
+/*
+@Authors - Craig and Patrick
+@Description - This is where all collision code for tilemap layers goes
+*/
+
 using UnityEngine;
 
 public class BodyBoxTrigger : MonoBehaviour
