@@ -9,6 +9,16 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+//!Only works if you don't care about joystick continuous values
+/*Input Guide:
+
+Jumping - (Input.GetKeyDown(KeyCode.Space) || Input.GetKey(KeyCode.JoystickButton0)
+Left - (Input.GetKey(KeyCode.A) || (Input.GetAxisRaw("Horizontal") < 0 && Input.GetAxisRaw("Horizontal") >= -1) || (Input.GetAxisRaw("Debug Horizontal") == -1))
+Right - (Input.GetKey(KeyCode.D) || (Input.GetAxisRaw("Horizontal") > 0 && Input.GetAxisRaw("Horizontal") <= 1) || (Input.GetAxisRaw("Debug Horizontal") == 1))
+Teleport to Checkpoint - (Input.GetKeyDown(KeyCode.R) || Input.GetKey(KeyCode.JoystickButton2))
+
+*/
+
 /*CONTROLLER KEYS
 Bottom Face Button = Joystick 0
 Left Face Button = Joystick 2
@@ -16,8 +26,27 @@ D-PAD = Input.GetAxis("Debug Horizontal")
 Joystick = Input.GetAxis("Horizontal")
 */
 
+
 public class Frog : MonoBehaviour
 {
+
+
+    public bool jumpButtonPressed(){
+        return (Input.GetKeyDown(KeyCode.Space) || Input.GetKey(KeyCode.JoystickButton0));
+    }
+
+    public bool leftButtonPressed(){
+        return (Input.GetKey(KeyCode.A) || (Input.GetAxisRaw("Horizontal") < 0 && Input.GetAxisRaw("Horizontal") >= -1) || (Input.GetAxisRaw("Debug Horizontal") == -1));
+    }
+
+    public bool rightButtonPressed(){
+        return (Input.GetKey(KeyCode.D) || (Input.GetAxisRaw("Horizontal") > 0 && Input.GetAxisRaw("Horizontal") <= 1) || (Input.GetAxisRaw("Debug Horizontal") == 1));
+    }
+
+    public bool teleportButtonPressed(){
+        return ((Input.GetKeyDown(KeyCode.R) || Input.GetKey(KeyCode.JoystickButton2)));
+    }
+
     public enum FrogState
     {
         JUMPING,
@@ -128,7 +157,7 @@ public class Frog : MonoBehaviour
         {
             case FrogState.JUMPING:
                 //cuts jump off early if player isn't holding down jump
-                if (!hopping && !Input.GetKey(KeyCode.Space) && !Input.GetKey(KeyCode.JoystickButton0)){
+                if (!hopping && !jumpButtonPressed()){
                     break;
                 }
                 
@@ -260,7 +289,7 @@ public class Frog : MonoBehaviour
     private void airtimeJumpMovement() {
         Vector2 deltaVec = new Vector2(0, 0);
         
-        if(airtime < MAX_JUMP && (Input.GetKey(KeyCode.Space) || Input.GetKey(KeyCode.JoystickButton0))){
+        if(airtime < MAX_JUMP && jumpButtonPressed()){
             airtime++;
             
             //Please don't change this value before talking to me!
@@ -352,11 +381,11 @@ public class Frog : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.R) || Input.GetKey(KeyCode.JoystickButton2))
+        if (teleportButtonPressed())
         {
             Respawn();
         }
-        if (state == FrogState.HANGING && Input.GetKeyDown(KeyCode.Space))
+        if (state == FrogState.HANGING && jumpButtonPressed())
         {
             ReleaseVine();
         }
@@ -386,7 +415,7 @@ public class Frog : MonoBehaviour
                 SetFlip(true);
             }
 
-            if(Input.GetKey(KeyCode.Space) || Input.GetKey(KeyCode.JoystickButton0)){
+            if(jumpButtonPressed()){
                 StartJump(jumpDirection, false);
                 //StartCoroutine(Jump(jumpDirection, false));
             }
