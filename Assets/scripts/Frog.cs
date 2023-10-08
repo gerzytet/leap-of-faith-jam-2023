@@ -31,19 +31,27 @@ public class Frog : MonoBehaviour
 {
 
 
-    public bool jumpButtonPressed(){
-        return (Input.GetKeyDown(KeyCode.Space) || Input.GetKey(KeyCode.JoystickButton0));
+    public bool jumpButtonPressed()
+    {
+        return (Input.GetKey(KeyCode.Space) || Input.GetKey(KeyCode.JoystickButton0));
     }
 
-    public bool leftButtonPressed(){
-        return (Input.GetKey(KeyCode.A) || (Input.GetAxisRaw("Horizontal") < 0 && Input.GetAxisRaw("Horizontal") >= -1) || (Input.GetAxisRaw("Debug Horizontal") == -1));
+    public bool leftButtonPressed()
+    {
+        return (Input.GetKey(KeyCode.A) ||
+                (Input.GetAxisRaw("Horizontal") < 0 && Input.GetAxisRaw("Horizontal") >= -1) ||
+                (Input.GetAxisRaw("Debug Horizontal") == -1));
     }
 
-    public bool rightButtonPressed(){
-        return (Input.GetKey(KeyCode.D) || (Input.GetAxisRaw("Horizontal") > 0 && Input.GetAxisRaw("Horizontal") <= 1) || (Input.GetAxisRaw("Debug Horizontal") == 1));
+    public bool rightButtonPressed()
+    {
+        return (Input.GetKey(KeyCode.D) ||
+                (Input.GetAxisRaw("Horizontal") > 0 && Input.GetAxisRaw("Horizontal") <= 1) ||
+                (Input.GetAxisRaw("Debug Horizontal") == 1));
     }
 
-    public bool teleportButtonPressed(){
+    public bool teleportButtonPressed()
+    {
         return ((Input.GetKeyDown(KeyCode.R) || Input.GetKey(KeyCode.JoystickButton2)));
     }
 
@@ -55,6 +63,13 @@ public class Frog : MonoBehaviour
         IDLE,
         HANGING,
         SPINNING
+    }
+
+    public enum JumpType
+    {
+        HOP,
+        JUMP,
+        SPRING
     }
 
     [SerializeField] private GameObject bodyBox;
@@ -123,13 +138,17 @@ public class Frog : MonoBehaviour
     }
 
     //if hopping is false, we know player is jumping
-    void StartJump(Vector2 jumpVector, bool hopping)
+    public void StartJump(Vector2 jumpVector, JumpType jumpType)
     {
+        if (state == FrogState.JUMPING)
+        {
+            return;
+        }
         state = FrogState.JUMPING;
         airtime = 0;
         jumpTime = 0;
         this.jumpVector = jumpVector;
-        this.hopping = hopping;
+        this.jumpType = jumpType;
         FreezeTargets();
     }
 
@@ -147,7 +166,7 @@ public class Frog : MonoBehaviour
 
     private int jumpTime = 0;
     private Vector2 jumpVector;
-    private bool hopping;
+    private JumpType jumpType;
     private float lastZRotation = 0f;
     void JumpUpdate()
     {
@@ -157,20 +176,23 @@ public class Frog : MonoBehaviour
         {
             case FrogState.JUMPING:
                 //cuts jump off early if player isn't holding down jump
-                if (!hopping && !jumpButtonPressed()){
+                if (jumpType == JumpType.JUMP && !jumpButtonPressed()){
+                    Debug.Log("Early exit");
+                    state = FrogState.MIDAIR;
                     break;
                 }
                 
                 bodyBox.GetComponent<Rigidbody2D>().AddForce(jumpVector);
                 jumpTime++;
-                if (jumpTime >= 5)
+                int targetJumpTime = jumpType == JumpType.SPRING ? 10 : 5;
+                if (jumpTime >= targetJumpTime)
                 {
                     UnlockTargets();
                     state = FrogState.MIDAIR;
                 }
                 break;
             case FrogState.MIDAIR:
-                if(!hopping){
+                if(jumpType != JumpType.HOP){
                     airtimeJumpMovement();
                 }
 
@@ -203,7 +225,7 @@ public class Frog : MonoBehaviour
     }
 
     //tucks legs back
-    private void AdjustTargets(bool instant = false, bool outstretched = true)
+    private void AdjustTargets(bool instant = false, bool outstretched = false)
     {
         //Debug.Log("Adjusting targets " + count);
         Vector3 targetTarget = handReferencePoint.transform.position - targetOffset;
@@ -283,7 +305,7 @@ public class Frog : MonoBehaviour
         grabbedVine.grabJoint.enabled = false;
         bodyBox.GetComponent<Rigidbody2D>().AddForce(jumpDirection * 2f);
         AdjustTargets(instant: true);
-        hopping = false;
+        jumpType = JumpType.JUMP;
     }
 
     private void airtimeJumpMovement() {
@@ -398,7 +420,7 @@ public class Frog : MonoBehaviour
         {
             return;
         }
-        if (state == FrogState.LANDING)
+        if (state is FrogState.LANDING or FrogState.IDLE)
         {
             AdjustTargets();
         }
@@ -416,7 +438,7 @@ public class Frog : MonoBehaviour
             }
 
             if(jumpButtonPressed()){
-                StartJump(jumpDirection, false);
+                StartJump(jumpDirection, JumpType.JUMP);
                 //StartCoroutine(Jump(jumpDirection, false));
             }
             else if (Input.GetKey(KeyCode.D) ||
@@ -425,9 +447,7 @@ public class Frog : MonoBehaviour
                     (Input.GetAxisRaw("Horizontal") > 0 && Input.GetAxisRaw("Horizontal") <= 1) ||
                     (Input.GetAxisRaw("Debug Horizontal") == -1) ||
                     (Input.GetAxisRaw("Debug Horizontal") == 1)) {
-                        state = FrogState.JUMPING;
-                        Debug.Log("Starting jump coroutine " + count);
-                        StartJump(hopDirection, true);
+                        StartJump(hopDirection, JumpType.HOP);
             }
         }
 
