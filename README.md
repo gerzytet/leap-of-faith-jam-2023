@@ -4,5 +4,3 @@ team:
 - Patrick Mayer
 - AL Seppala
 - Craig White
-
-funny VS commit
