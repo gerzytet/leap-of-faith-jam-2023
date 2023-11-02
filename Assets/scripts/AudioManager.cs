@@ -1,3 +1,7 @@
+/*
+@Authors - Craig
+*/
+
 using UnityEngine;
 
 public class AudioManager : MonoBehaviour
