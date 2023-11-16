@@ -22944,7 +22944,7 @@ MonoBehaviour:
   rotationRate: -7
   frontFoot: {fileID: 6956849462627084321}
   backFoot: {fileID: 3506977032858652605}
-  handReferencePoint: {fileID: 1755143185}
+  handReferencePoint: {fileID: 7209163686957045726}
   upperFrontArm: {fileID: 584980510617886821}
   upperBackArm: {fileID: 8076273784054485097}
   jumpDirection: {x: 0, y: 600}

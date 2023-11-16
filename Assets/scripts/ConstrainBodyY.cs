@@ -1,6 +1,6 @@
 /*
 @Authors - Craig
-@Description - Y movement constraints
+@Description - Legacy class: Y movement constraints
 */
 
 using System.Collections;
