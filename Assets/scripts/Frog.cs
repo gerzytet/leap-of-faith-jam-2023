@@ -77,11 +77,17 @@ public class Frog : MonoBehaviour
         SPRING
     }
 
+    //parent of body, big hitbox around frog
     [SerializeField] private GameObject bodyBox;
+    //!Inverse kinematics targets. Ensures the keep the same pose every time.
     [SerializeField] private GameObject backFootTarget;
     [SerializeField] private GameObject frontFootTarget;
+
+    
     [SerializeField] private GameObject body;
+    
     [SerializeField] private float rotationRate;
+    
     [SerializeField] private GameObject frontFoot;
     [SerializeField] private GameObject backFoot;
 
@@ -131,12 +137,14 @@ public class Frog : MonoBehaviour
         instance = this;
     }
 
+    //when frog moves, targets don't move. This makes the legs look like they're pushing up.
     private void FreezeTargets()
     {
         backFootTarget.transform.parent.transform.SetParent(transform);
         frontFootTarget.transform.parent.transform.SetParent(transform);
     }
 
+    //re-parents targets to body (or something like that)
     private void UnlockTargets()
     {
         backFootTarget.transform.parent.transform.SetParent(bodyBox.transform);
