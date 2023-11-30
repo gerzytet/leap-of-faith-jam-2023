@@ -1472,7 +1472,7 @@ GameObject:
   - component: {fileID: 419706320}
   - component: {fileID: 419706321}
   m_Layer: 0
-  m_Name: Circle
+  m_Name: Level 1 Checkpoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -14169,7 +14169,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3947966765960677488, guid: 4c526b27047750c4f865af75cee94f26, type: 3}
       propertyPath: m_Name
-      value: Sign Overlay
+      value: UI overlay
+      objectReference: {fileID: 0}
+    - target: {fileID: 5463797695771651973, guid: 4c526b27047750c4f865af75cee94f26, type: 3}
+      propertyPath: m_Name
+      value: Sign text
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4c526b27047750c4f865af75cee94f26, type: 3}
@@ -108517,12 +108521,20 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 405497097392552395, guid: a4ef0a3a4f56fce46bb5435169baa4b9, type: 3}
+      propertyPath: m_Anchor.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 405497097392552395, guid: a4ef0a3a4f56fce46bb5435169baa4b9, type: 3}
+      propertyPath: m_Anchor.y
+      value: 1.5099999
+      objectReference: {fileID: 0}
+    - target: {fileID: 405497097392552395, guid: a4ef0a3a4f56fce46bb5435169baa4b9, type: 3}
       propertyPath: m_ConnectedAnchor.x
       value: 217.7
       objectReference: {fileID: 0}
     - target: {fileID: 405497097392552395, guid: a4ef0a3a4f56fce46bb5435169baa4b9, type: 3}
       propertyPath: m_ConnectedAnchor.y
-      value: 34.83543
+      value: 51.122818
       objectReference: {fileID: 0}
     - target: {fileID: 405497097392552398, guid: a4ef0a3a4f56fce46bb5435169baa4b9, type: 3}
       propertyPath: m_Enabled
@@ -109893,7 +109905,7 @@ MonoBehaviour:
   rotationRate: -7
   frontFoot: {fileID: 6956849462627084321}
   backFoot: {fileID: 3506977032858652605}
-  handReferencePoint: {fileID: 7209163686957045726}
+  handReferencePoint: {fileID: 1755143185}
   upperFrontArm: {fileID: 584980510617886821}
   upperBackArm: {fileID: 8076273784054485097}
   jumpDirection: {x: 0, y: 600}
@@ -109902,6 +109914,7 @@ MonoBehaviour:
   state: 3
   fixLegsRate: 0.8
   airtime: 0
+  currentLevel: 1
   currentCheckpoint: {fileID: 0}
   spinTime: 0
 --- !u!1 &6502518012649654049
