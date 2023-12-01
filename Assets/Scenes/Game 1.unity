@@ -5442,6 +5442,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Waterfall
       objectReference: {fileID: 0}
+    - target: {fileID: 3759415231632245707, guid: 22a4be948231acb4f8fe2001acfa7307, type: 3}
+      propertyPath: m_SurfaceArc
+      value: 178
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 22a4be948231acb4f8fe2001acfa7307, type: 3}
 --- !u!1 &3919553085498957646
@@ -6248,6 +6252,7 @@ MonoBehaviour:
   state: 3
   fixLegsRate: 0.8
   airtime: 0
+  currentLevel: 1
   currentCheckpoint: {fileID: 0}
   spinTime: 0
 --- !u!1 &6502518012649654049
