@@ -99,7 +99,7 @@ public class Frog : MonoBehaviour
     [SerializeField] private GameObject upperBackArm;
     //[SerializeField] private GameObject frontHand;
 
-    public const int MAX_JUMP = 1000;
+    public const int MAX_AIRTIME_MOVEMENT = 200;
 
     private Vector3 targetOffset;
     public Vector2 jumpDirection;
@@ -111,7 +111,7 @@ public class Frog : MonoBehaviour
     public float fixLegsRate;
     public int airtime = 0;
 
-    private int currentLevel = 1;
+    public int currentLevel = 1;
 
     private bool flippedLeft = false;
     public Checkpoint currentCheckpoint;
@@ -344,10 +344,12 @@ public class Frog : MonoBehaviour
 
     private void airtimeJumpMovement() {
         Vector2 deltaVec = new Vector2(0, 0);
+        airtime++;
+        if (airtime > MAX_AIRTIME_MOVEMENT){
+            return;
+        }
         
-        if(airtime < MAX_JUMP && jumpButtonPressed()){
-            airtime++;
-            
+        if(jumpButtonPressed()){
             //Please don't change this value before talking to me!
             deltaVec.y += 85;
         }
@@ -383,7 +385,12 @@ public class Frog : MonoBehaviour
             }
         }
 
-        bodyBox.GetComponent<Rigidbody2D>().AddForce(deltaVec);
+        if (deltaVec.magnitude > 0)
+        {
+            bodyBox.GetComponent<Rigidbody2D>().velocity *= 0.992f;
+            bodyBox.GetComponent<Rigidbody2D>().AddForce(deltaVec);
+        }
+        
         // Debug.Log("X vel: " + deltaVec.x);
         // Debug.Log(Input.GetAxisRaw("Horizontal").ToString());
     }

@@ -14,9 +14,9 @@ public class Menu : MonoBehaviour
     [SerializeField] private Button playGameButton;
     [SerializeField] private Button quitGameButton;
     
-    
     public void playGame(){
         Debug.Log("A button is working");
+        CommandManager.commandsEnabled = false;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
     }
     public void quitGame(){

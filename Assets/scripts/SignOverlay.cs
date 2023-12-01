@@ -18,12 +18,12 @@ public class SignOverlay : MonoBehaviour
 
     public void Display(string s)
     {
-        gameObject.SetActive(true);
+        textField.enabled = true;
         textField.text = s;
     }
     
     public void Undisplay()
     {
-        gameObject.SetActive(false);
+        textField.enabled = false;
     }
 }
