@@ -99,7 +99,7 @@ public class Frog : MonoBehaviour
     [SerializeField] private GameObject upperBackArm;
     //[SerializeField] private GameObject frontHand;
 
-    public const int MAX_AIRTIME_MOVEMENT = 200;
+    public const int MAX_AIRTIME_MOVEMENT = 50;
 
     private Vector3 targetOffset;
     public Vector2 jumpDirection;
@@ -349,7 +349,8 @@ public class Frog : MonoBehaviour
     private void airtimeJumpMovement() {
         Vector2 deltaVec = new Vector2(0, 0);
         airtime++;
-        if (airtime > MAX_AIRTIME_MOVEMENT){
+        //hanging exception is so you can gain momentum on vines
+        if (airtime > MAX_AIRTIME_MOVEMENT && state != FrogState.HANGING){
             return;
         }
         
