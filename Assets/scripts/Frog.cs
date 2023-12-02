@@ -445,8 +445,8 @@ public class Frog : MonoBehaviour
         TeleportToPosition(nLevel.transform.position);
         //SignOverlay.instance.Display("Level " + currentLevel.ToString());
         //add code to make this wait 5 seconds
-        //SignOverlay.instance.Undisplay();
-        //SignOverlay.instance.Display(levelDescriptions[currentLevel-1]);
+        SignOverlay.instance.Undisplay();
+        SignOverlay.instance.Display(levelDescriptions[currentLevel-1]);
     }
 
     public void Respawn()
@@ -474,6 +474,7 @@ public class Frog : MonoBehaviour
         AudioManager.instance.PlayDeath();
         Debug.Log("dying");
         StartCoroutine(DieRoutine());
+        state = FrogState.IDLE;
     }
 
     public void SetCheckpoint(Checkpoint checkpoint)
