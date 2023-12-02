@@ -7,6 +7,8 @@ public class SignOverlay : MonoBehaviour
 {
     public static SignOverlay instance;
     public TextMeshProUGUI textField;
+    public TextMeshProUGUI startOfLevelTitle;
+    public TextMeshProUGUI startOfLevelSubtitle;
     void Awake()
     {
         instance = this;
@@ -14,6 +16,8 @@ public class SignOverlay : MonoBehaviour
 
     void Start() {
         Undisplay();
+        startOfLevelTitle.enabled = false;
+        startOfLevelSubtitle.enabled = false;
     }
 
     public void Display(string s)
@@ -25,5 +29,21 @@ public class SignOverlay : MonoBehaviour
     public void Undisplay()
     {
         textField.enabled = false;
+    }
+
+    IEnumerator DisplayStartOfLevelCoroutine(string title, string subtitle)
+    {
+        startOfLevelTitle.enabled = true;
+        startOfLevelSubtitle.enabled = true;
+        startOfLevelTitle.text = title;
+        startOfLevelSubtitle.text = subtitle;
+        yield return new WaitForSeconds(2);
+        startOfLevelTitle.enabled = false;
+        startOfLevelSubtitle.enabled = false;
+    }
+    
+    public void DisplayStartOfLevel(string title, string subtitle)
+    {
+        StartCoroutine(DisplayStartOfLevelCoroutine(title, subtitle));
     }
 }
