@@ -99,7 +99,8 @@ public class Frog : MonoBehaviour
     [SerializeField] private GameObject upperBackArm;
     //[SerializeField] private GameObject frontHand;
 
-    public const int MAX_AIRTIME_MOVEMENT = 50;
+//!MESS WITH THIS VALUE
+    public const int MAX_AIRTIME_MOVEMENT = 35;
 
     private Vector3 targetOffset;
     public Vector2 jumpDirection;
@@ -366,16 +367,7 @@ public class Frog : MonoBehaviour
     private void airtimeJumpMovement() {
         Vector2 deltaVec = new Vector2(0, 0);
         airtime++;
-        //hanging exception is so you can gain momentum on vines
-        if (airtime > MAX_AIRTIME_MOVEMENT && state != FrogState.HANGING){
-            return;
-        }
-        
-        if(jumpButtonPressed()){
-            //Please don't change this value before talking to me!
-            deltaVec.y += 85;
-        }
-        
+
         //snappy horiztonal direction changing. If using DPAD, movement will depend on how hard you are pressing.
         if (Input.GetKey(KeyCode.A) || (Input.GetAxisRaw("Horizontal") < 0 && Input.GetAxisRaw("Horizontal") >= -1) || (Input.GetAxisRaw("Debug Horizontal") == -1)){
             //left key and not currently moving right
@@ -407,8 +399,17 @@ public class Frog : MonoBehaviour
             }
         }
 
+        //hanging exception is so you can gain momentum on vines
+        if (airtime <= MAX_AIRTIME_MOVEMENT || state == FrogState.HANGING){
+            if(jumpButtonPressed()){
+            //Please don't change this value before talking to me!
+            deltaVec.y += 85;
+            }
+        }
+
         if (deltaVec.magnitude > 0)
         {
+            //!essentially terminal velocity air resistance. DO NOT CHANGE!!!!
             bodyBox.GetComponent<Rigidbody2D>().velocity *= 0.992f;
             bodyBox.GetComponent<Rigidbody2D>().AddForce(deltaVec);
         }
@@ -416,6 +417,12 @@ public class Frog : MonoBehaviour
         // Debug.Log("X vel: " + deltaVec.x);
         // Debug.Log(Input.GetAxisRaw("Horizontal").ToString());
     }
+
+        
+        
+        
+        
+        
 
     /*private void ProcessArms()
     {
