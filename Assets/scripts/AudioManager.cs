@@ -11,6 +11,7 @@ public class AudioManager : MonoBehaviour
     public AudioSource jumpSource;
     public AudioSource deathSource;
     public AudioSource hopSource;
+    public AudioSource checkpointSource;
     void Awake()
     {
         instance = this;
@@ -34,5 +35,9 @@ public class AudioManager : MonoBehaviour
     public void PlayHop()
     {
         hopSource.Play();
+    }
+    public void PlayCheckpoint()
+    {
+        checkpointSource.Play();
     }
 }

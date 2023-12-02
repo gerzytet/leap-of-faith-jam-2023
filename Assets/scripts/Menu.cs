@@ -1,6 +1,6 @@
 /*
 @Authors - Patrick
-@Description - Main menu code
+@Description - level select code
 */
 
 using System.Collections;
@@ -15,13 +15,14 @@ public class Menu : MonoBehaviour
     [SerializeField] private Button quitGameButton;
     
     public void playGame(){
-        Debug.Log("A button is working");
+        //Debug.Log("A button is working");
         CommandManager.commandsEnabled = false;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
     }
     public void quitGame(){
         Debug.Log("User has quit game");
         Application.Quit();
+        //add some code here to serialize values
     }
 
     void Update(){

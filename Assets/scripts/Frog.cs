@@ -136,6 +136,7 @@ public class Frog : MonoBehaviour
     void Awake()
     {
         instance = this;
+        //DontDestroyOnLoad(this.gameObject);
     }
 
     //when frog moves, targets don't move. This makes the legs look like they're pushing up.

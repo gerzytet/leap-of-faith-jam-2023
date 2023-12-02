@@ -21,12 +21,12 @@ public class Checkpoint : MonoBehaviour
         {
             col.gameObject.GetComponentInParent<Frog>().SetCheckpoint(this);
         }
-
         if (!touched && isStartOfLevel)
         {
             SignOverlay.instance.DisplayStartOfLevel(name.Substring(0, name.IndexOf(' ', 6) + 1), startOfLevelMessage);
             touched = true;
-        }
+            AudioManager.instance.PlayCheckpoint();
+        } 
     }
 
     void Update()
@@ -36,5 +36,10 @@ public class Checkpoint : MonoBehaviour
             GetComponent<SpriteRenderer>().color =
                 Frog.instance.currentCheckpoint == this ? activeColor : inactiveColor;
         }
+
+        /*if (!touched && GetComponent<SpriteRenderer>().color == activeColor){
+            touched = true;
+            AudioManager.instance.PlayCheckpoint();
+        }*/
     }
 }
