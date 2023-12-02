@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using System;
+using Unity.VisualScripting;
 
 public class Timer : MonoBehaviour
 {
@@ -19,6 +21,10 @@ public class Timer : MonoBehaviour
     [Header("Format Settings")]
     public float currentTime;*/
 
+    public static Timer instance;
+    void Awake(){
+        instance = this;
+    }
     // Start is called before the first frame update
     void Start()
     {
