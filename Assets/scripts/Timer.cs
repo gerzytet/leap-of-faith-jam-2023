@@ -32,6 +32,6 @@ public class Timer : MonoBehaviour
     {
         
         currentTime += Time.deltaTime;
-        timerText.text = currentTime.ToString("0.00");
+        timerText.text = "Time - " + currentTime.ToString("0.00");
     }
 }

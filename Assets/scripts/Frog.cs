@@ -8,6 +8,7 @@ using System.Collections;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 //!Only works if you don't care about joystick continuous values
 /*Input Guide:
@@ -477,6 +478,11 @@ public class Frog : MonoBehaviour
     public void reachedFlag(int flagNumber){
         Debug.Log("Reached flag");
         currentLevel = flagNumber + 1;
+        
+        if (currentLevel >= 8){
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 2);
+        }
+        
         TeleportToLevel();
     }
 
