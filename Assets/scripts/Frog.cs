@@ -282,6 +282,7 @@ public class Frog : MonoBehaviour
         {
             bodyBox.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
             bodyBox.GetComponent<Rigidbody2D>().angularVelocity = 0;
+            //if (frontFootTarget.transform.parent == this)
             //rotationRate = -rotationRate;
             targetOffset.x = -targetOffset.x;
             hopDirection.x = -hopDirection.x;
@@ -335,7 +336,7 @@ public class Frog : MonoBehaviour
 
     private int MAX_SPIN_TIME = 25;
     public int spinTime = 0;
-    private void ReleaseVine()
+    private void JumpFromVine()
     {
         spinTime = 0;
         state = FrogState.SPINNING;
@@ -346,6 +347,22 @@ public class Frog : MonoBehaviour
         jumpType = JumpType.JUMP;
     }
 
+    private void ResetFrog()
+    {
+        spinTime = 0;
+        AdjustTargets(instant: true);
+        if (grabbedVine) grabbedVine.grabJoint.enabled = false;
+        bodyBox.GetComponent<Rigidbody2D>().angularVelocity = 0f;
+        jumpTime = 0;
+        state = FrogState.IDLE;
+        bodyBox.transform.rotation = Quaternion.Euler(0, bodyBox.transform.rotation.eulerAngles.y, 0);
+        bodyBox.GetComponent<Rigidbody2D>().angularVelocity = 0f;
+        bodyBox.GetComponent<Rigidbody2D>().constraints |= RigidbodyConstraints2D.FreezeRotation;
+        AdjustTargets(instant: true);
+        grabbedVine = null;
+        SetArmsAngle(startArmAngle);
+    }
+    
     private void airtimeJumpMovement() {
         Vector2 deltaVec = new Vector2(0, 0);
         airtime++;
@@ -454,6 +471,7 @@ public class Frog : MonoBehaviour
     {
         TeleportToPosition(currentCheckpoint.transform.position);
         SetFlip(currentCheckpoint.flippedLeft);
+        ResetFrog();
     }
 
     public void reachedFlag(int flagNumber){
@@ -491,7 +509,7 @@ public class Frog : MonoBehaviour
         }
         if (state == FrogState.HANGING && jumpButtonJustPressed())
         {
-            ReleaseVine();
+            JumpFromVine();
         }
     }
     
