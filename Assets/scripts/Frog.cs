@@ -253,6 +253,9 @@ public class Frog : MonoBehaviour
     void Start()
     {
         targetOffset = handReferencePoint.transform.position - frontFootTarget.transform.position;
+        currentLevel = PlayerPrefs.GetInt("level") +1;
+        Debug.Log(currentLevel);
+        TeleportToLevel();
         //StartCoroutine(Jump());
     }
 
@@ -479,6 +482,7 @@ public class Frog : MonoBehaviour
         Debug.Log("Reached flag");
         currentLevel = flagNumber + 1;
         
+
         if (currentLevel >= 8){
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 2);
         }

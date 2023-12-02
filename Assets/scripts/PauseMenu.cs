@@ -32,12 +32,27 @@ public class PauseMenu : MonoBehaviour
         Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 1);
     }
-
+    
     public void goToLevelSelect(){
-        //Debug.Log("going to main menu");
-        // Time.timeScale = 1f;
-        // SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex +1);
+        Debug.Log("going to main menu");
+        Time.timeScale = 1f;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex +1);
+        /*
+
+        i canvas ake a pael that toggles on level select 
+
+        with all the screen
+
+        database ;eve; start
+        for each level start
+
+        */
+
     }
+
+    /// <summary>
+    /// tele[prt to this area]
+    /// </summary>
 
     // Update is called once per frame
     void Update()
