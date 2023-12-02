@@ -116,6 +116,10 @@ public class Frog : MonoBehaviour
     private bool flippedLeft = false;
     public Checkpoint currentCheckpoint;
 
+    //AL's level description
+    public String [] levelDescriptions = {"level description 1", "level description 2", "these are all placeholders", "these are all placeholders"
+    , "these are all placeholders", "these are all placeholders"};
+
     // float DPADHorizontal = Input.GetAxis("Horizontal");
 
     // public bool leftDPADDown() {
@@ -439,6 +443,10 @@ public class Frog : MonoBehaviour
         Debug.Log(nextCheckpointName);
         GameObject nLevel = GameObject.Find(nextCheckpointName);
         TeleportToPosition(nLevel.transform.position);
+        //SignOverlay.instance.Display("Level " + currentLevel.ToString());
+        //add code to make this wait 5 seconds
+        //SignOverlay.instance.Undisplay();
+        //SignOverlay.instance.Display(levelDescriptions[currentLevel-1]);
     }
 
     public void Respawn()
