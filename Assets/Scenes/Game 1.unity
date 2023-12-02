@@ -1329,6 +1329,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d57dfc6914774c6eb00d3f0054861d2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &932964398 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3947966765960677488, guid: 4c526b27047750c4f865af75cee94f26, type: 3}
+  m_PrefabInstance: {fileID: 4489932183845061192}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &940890260
 GameObject:
   m_ObjectHideFlags: 0
@@ -1691,6 +1696,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 989912486}
+  - component: {fileID: 989912487}
   m_Layer: 0
   m_Name: TimerManager
   m_TagString: Untagged
@@ -1713,6 +1719,21 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 18
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &989912487
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 989912485}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e7d09e3ed6ea1144a5baf1a64b40134, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  parentPanel: {fileID: 932964398}
+  timerText: {fileID: 2056028875}
+  currentTime: 0
 --- !u!4 &1005463534 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 9070150285358751873, guid: 959ecd6a29ed02c4a994eb2077ee72de, type: 3}
@@ -2731,7 +2752,7 @@ GameObject:
   - component: {fileID: 2056028876}
   - component: {fileID: 2056028875}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: TimerText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
