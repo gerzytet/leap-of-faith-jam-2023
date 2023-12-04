@@ -18,9 +18,12 @@ public class LevelSelectMenu : MonoBehaviour
     public void selectLevel(){
         //dumb way of converting name to int
         int buttonNum = int.Parse(EventSystem.current.currentSelectedGameObject.name);
+        PlayerPrefs.SetInt("level",buttonNum);
+        
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 1);
 
+
         Frog.instance.reachedFlag(buttonNum);
-        Debug.Log("Button num: " + buttonNum);
+        //Debug.Log("Button num: " + buttonNum);
     }
 }
